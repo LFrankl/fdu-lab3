@@ -1,0 +1,24 @@
+app:
+  name: express-logistics
+  port: 8080
+  env: dev
+
+mysql:
+  dsn: root:mysql123@tcp(127.0.0.1:3306)/express_logistics?charset=utf8mb4&parseTime=True&loc=Local
+  max_open_conns: 20
+  max_idle_conns: 10
+  conn_max_lifetime: 3600
+
+redis:
+  addr: redis:6379
+  password: ""
+  db: 0
+  pool_size: 10
+
+rabbitmq:
+  url: amqp://guest:guest@rabbitmq:5672/
+  exchange: express_exchange
+  queue: express_queue
+
+geo:
+  amap_key: your_amap_api_key  # 高德地图API密钥
