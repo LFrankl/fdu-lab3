@@ -39,7 +39,7 @@ func (s *packageService) CreatePackage(pkg *model.Package, operator, nodeName, n
 		pkg.PackageID = s.idGen.GeneratePackageID()
 	}
 	// 设置初始状态
-	pkg.Status = "collected"
+	pkg.Status = "sorted"
 
 	// 创建包裹
 	if err := s.pkgRepo.Create(pkg); err != nil {

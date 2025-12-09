@@ -39,8 +39,8 @@ func main() {
 		&model.Package{},
 		&model.PackageTrace{},
 		&model.AbnormalRecord{},
-		//&model.TransportTask{},
-		//&model.TransportTaskPackage{},
+		&model.TransportTask{},
+		&model.TransportTaskPackage{},
 		//&model.DeliveryTask{},
 		//&model.DeliveryTaskPackage{},
 	); err != nil {

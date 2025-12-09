@@ -32,7 +32,7 @@ func SetupRouter() *gin.Engine {
 
 	// 初始化处理器
 	pkgHandler := handler.NewPackageHandler()
-	//transportHandler := handler.NewTransportHandler()
+	transportHandler := handler.NewTransportHandler()
 	//deliveryHandler := handler.NewDeliveryHandler()
 
 	// API路由组
@@ -46,13 +46,20 @@ func SetupRouter() *gin.Engine {
 			packages.POST("/:package_id/abnormal/sorting", pkgHandler.HandleSortingAbnormal)
 		}
 
-		//// 运输调度
-		//transport := api.Group("/transport")
-		//{
-		//	transport.POST("/tasks", transportHandler.CreateTransportTask)
-		//	transport.PUT("/tasks/:task_id/route", transportHandler.AdjustRoute)
-		//	transport.GET("/drivers/:driver_id/tasks", transportHandler.GetDriverTasks)
-		//}
+		// 运输调度
+		transport := api.Group("/transport")
+		{
+			// 创建运输任务
+			transport.POST("/tasks", transportHandler.CreateTask)
+			// 变更任务状态
+			transport.PUT("/tasks/:task_id/status", transportHandler.ChangeTaskStatus)
+			// 绑定包裹到任务
+			transport.POST("/tasks/:task_id/packages/bind", transportHandler.BindPackages)
+			// 司机查询任务包裹列表
+			transport.GET("/tasks/:task_id/packages", transportHandler.GetDriverTaskPackages)
+			// 上报运输异常
+			transport.POST("/tasks/:task_id/abnormal", transportHandler.ReportAbnormal)
+		}
 		//
 		//// 派送管理
 		//delivery := api.Group("/delivery")
