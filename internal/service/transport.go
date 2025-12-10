@@ -105,10 +105,12 @@ func (s *TransportSvc) BindPackagesToTask(taskID string, packageIDs []string) er
 		}
 	}
 	// 3. 执行领域行为：绑定包裹
+	//这里绑定的时候要不要直接把包裹的状态也改了
 	if err := task.BindPackage(packageIDs); err != nil {
 		fmt.Println(err)
 		return err
 	}
+
 	// 4. 保存任务（更新包裹数量）
 	//保存的时候，不小心把为空的一些时间也算做更新范围了
 	if err := s.transportRepo.UpdateTask(task); err != nil {

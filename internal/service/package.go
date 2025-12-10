@@ -14,6 +14,7 @@ type PackageService interface {
 	CreatePackage(pkg *model.Package, operator, nodeName, nodeAddr string) (*model.Package, error)
 	GetPackageDetail(packageID string) (map[string]interface{}, error)
 	HandleSortingAbnormal(packageID, reason, handler string) error
+	ChangeStatus(packageID string, status string) error
 }
 
 // packageService 实现
@@ -32,14 +33,22 @@ func NewPackageService() PackageService {
 	}
 }
 
+// ChangeStatus 更改状态
+// 这里我们认为是提供一般性状态变更，异常不走这里
+func (s *packageService) ChangeStatus(packageID string, status string) error {
+	//调用底层的updateStatus
+	//id和status已在上层做过检验
+	return s.pkgRepo.UpdateStatus(packageID, status, "", "")
+}
+
 // CreatePackage 创建包裹并添加揽收轨迹
 func (s *packageService) CreatePackage(pkg *model.Package, operator, nodeName, nodeAddr string) (*model.Package, error) {
 	// 生成运单号
 	if pkg.PackageID == "" {
 		pkg.PackageID = s.idGen.GeneratePackageID()
 	}
-	// 设置初始状态
-	pkg.Status = "sorted"
+	// 这里初始化为collected只有后续检查后，才会变成sorted
+	pkg.Status = "collected"
 
 	// 创建包裹
 	if err := s.pkgRepo.Create(pkg); err != nil {
@@ -191,6 +200,7 @@ func (s *packageService) GetPackageDetail(packageID string) (map[string]interfac
 }
 
 // HandleSortingAbnormal 处理分拣异常
+// 这里直接给上层调用，功能是 更新对应包裹的状态为不正常，然后，把异常传到db上传
 func (s *packageService) HandleSortingAbnormal(packageID, reason, handler string) error {
 	// 更新包裹状态
 	if err := s.pkgRepo.UpdateStatus(packageID, "abnormal", reason, handler); err != nil {

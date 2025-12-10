@@ -91,7 +91,7 @@ func (t *TransportTask) BindPackage(packageIDs []string) error {
 		return errno.ErrTransportTaskNotBindable
 	}
 	// 更新包裹数量
-	t.PackageCount = len(packageIDs)
+	t.PackageCount += len(packageIDs)
 	t.UpdatedAt = time.Now()
 	return nil
 }

@@ -37,6 +37,77 @@ type CreatePackageRequest struct {
 	Height           float64 `json:"height"`
 }
 
+// Sorting sorting 分拣
+// 需要什么参数呢，一个包裹id.返回的是包裹的异常与否，异常就会告知异常原因，改变状态。不异常就是到了
+// 分拣完毕，改变状态，
+// 这个函数只处理collected的包裹，不处理abnormal和其他
+// _包裹地址不清晰、标签损坏或目的地不明确
+// 如果一切正常，把包裹改成sorted,后续交给运输领域完成
+func (h *PackageHandler) Sorting(c *gin.Context) {
+	pkgId := c.Param("package_id")
+	if pkgId == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": http.StatusBadRequest,
+			"msg":  "packageId不许为空",
+		})
+	}
+	_, err := h.pkgService.GetPackageDetail(pkgId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  err.Error(),
+		})
+	}
+	/*
+		这里模拟一下三种错误的情况，然后写好对应的reason和handle
+		然后把状态改成abnormal
+		状态不用在这里改，下游有一个异常处理服务，已经进行了状态的更改，看看能否直接调用
+	*/
+
+	//没有问题
+	//改变包裹状态的函数
+	//
+	err = h.pkgService.ChangeStatus(pkgId, "sorted")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": http.StatusOK,
+		"msg":  "success",
+	})
+}
+
+//请求体
+
+type changeStatusRequest struct {
+	//PackageId string `json:"package_id" binding:"required"`
+	Status string `json:"status" binding:"required"`
+}
+
+// ChangePackageStatus 改变包裹状态
+// package_id
+func (h *PackageHandler) ChangePackageStatus(c *gin.Context) {
+	pkgId := c.Param("package_id")
+	if pkgId == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": http.StatusBadRequest,
+			"msg":  "id不能为空",
+		})
+	}
+	err := c.ShouldBindBodyWithJSON(&changeStatusRequest{})
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": http.StatusBadRequest,
+			"msg":  err.Error(),
+		})
+	}
+	//调用service
+
+}
+
 // CreatePackage 创建包裹（揽收）
 // @Summary 创建包裹
 // @Description 网点工作人员创建包裹记录（揽收）
