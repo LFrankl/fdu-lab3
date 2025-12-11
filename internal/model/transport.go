@@ -24,7 +24,7 @@ type TransportTask struct {
 	UpdatedAt        time.Time      `gorm:"autoUpdateTime;comment:更新时间"`
 	DeletedAt        gorm.DeletedAt `gorm:"index;comment:软删除时间"`
 	// 关联值对象
-	Route    TransportRoute    `gorm:"embedded;comment:运输路线"`     // 嵌入式值对象
+	Route    TransportRoute    `gorm:"embedded;comment:运输路线"`   // 嵌入式值对象
 	Abnormal TransportAbnormal `gorm:"embedded;comment:运输异常信息"` // 嵌入式值对象
 }
 
